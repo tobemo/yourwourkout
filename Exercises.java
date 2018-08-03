@@ -21,21 +21,24 @@ public class Exercises extends AppCompatActivity {
     //sets
     private int setCounter;
 
-    private EditText eRestInput;
-    private Button eRestSet;
+    private EditText eEditRestInput;
+    private Button eButtonRestSet;
+
+    private long eRestTimeInMillis;
 
     //reps
-    private EditText eEditTextInput;
+    private EditText eEditTimeInput;
     private TextView eTextViewCountDown;
     private Button eButtonStartPause;
     private Button eButtonReset;
-    private Button eButtonSet;
+    private Button eButtonTimeSet;
 
     private CountDownTimer eCountDownTimer;
 
     private boolean eTimerRunning;
+    private boolean eTimeSet = false;
 
-    private long eStatrTimeInMillis;
+    private long eStartTimeInMillis;
     private long eTimeLeftInMillis;
     private long eEndTime;
 
@@ -49,6 +52,8 @@ public class Exercises extends AppCompatActivity {
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
+
+        //---------------------------------------BOTTOM NAV-------------------------------------------
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
@@ -66,110 +71,143 @@ public class Exercises extends AppCompatActivity {
         }
     };
 
-    @Override
-    protected void onStart() {
-        super.onStart();
 
-        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
 
-        eStatrTimeInMillis = prefs.getLong(startTimeInMillis,666);
-        eTimeLeftInMillis = prefs.getLong(millisLeft, eStatrTimeInMillis);
-        eTimerRunning = prefs.getBoolean(timerRunning,false);
-        startTimer();
-
-        updateCountDownText();
-        updateInterface();
-
-        if(eTimerRunning)   {
-            eEndTime = prefs.getLong(endTime,0);
-            eTimeLeftInMillis = eEndTime - System.currentTimeMillis();
-
-            if(eTimeLeftInMillis < 0)   {
-                eTimeLeftInMillis = 0;
-                eTimerRunning = false;
-                updateCountDownText();
-                updateInterface();
-            }   else    {
-                startTimer();
-            }
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-
-        editor.putLong(startTimeInMillis, eStatrTimeInMillis);
-        editor.putLong(millisLeft,eTimeLeftInMillis);
-        editor.putBoolean(timerRunning,eTimerRunning);
-        editor.putLong(endTime,eEndTime);
-
-        editor.apply();
-
-        if (eCountDownTimer != null) {
-            eCountDownTimer.cancel();
-        }
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//
+//        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+//
+//        eStartTimeInMillis = prefs.getLong(startTimeInMillis,666);
+//        eTimeLeftInMillis = prefs.getLong(millisLeft, eStartTimeInMillis);
+//        eTimerRunning = prefs.getBoolean(timerRunning,false);
+//        startTimer(eTimeLeftInMillis);
+//
+//        updateCountDownText();
+//        updateInterface();
+//
+//        if(eTimerRunning)   {
+//            eEndTime = prefs.getLong(endTime,0);
+//            eTimeLeftInMillis = eEndTime - System.currentTimeMillis();
+//
+//            if(eTimeLeftInMillis < 0)   {
+//                eTimeLeftInMillis = 0;
+//                eTimerRunning = false;
+//                updateCountDownText();
+//                updateInterface();
+//            }   else    {
+//                startTimer(eTimeLeftInMillis);
+//            }
+//        }
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//
+//        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = prefs.edit();
+//
+//        editor.putLong(startTimeInMillis, eStartTimeInMillis);
+//        editor.putLong(millisLeft,eTimeLeftInMillis);
+//        editor.putBoolean(timerRunning,eTimerRunning);
+//        editor.putLong(endTime,eEndTime);
+//
+//        editor.apply();
+//
+//        if (eCountDownTimer != null) {
+//            eCountDownTimer.cancel();
+//        }
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercises);
 
-        eRestInput = findViewById(R.id.et_set_rest_time);
-        eRestSet = findViewById(R.id.bt_set_rest);
+        //init layout elements--------------
+
+        eEditRestInput = findViewById(R.id.et_set_rest_time);
+        eButtonRestSet = findViewById(R.id.bt_set_rest);
 
         eTextViewCountDown = findViewById(R.id.tv_counter);
-        eEditTextInput = findViewById(R.id.et_set_time);
+        eEditTimeInput = findViewById(R.id.et_set_time);
 
         eButtonStartPause = findViewById(R.id.bt_start_pause);
         eButtonReset = findViewById(R.id.bt_reset);
-        eButtonSet = findViewById(R.id.bt_set);
+        eButtonTimeSet = findViewById(R.id.bt_set);
+
+        //read buttons-------------------
 
         eButtonStartPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (eTimerRunning)  {
                     pauseTimer();
                 }   else    {
-                    startTimer();
+                    if(!eTimeSet)    {
+                        Toast.makeText(Exercises.this, "Please set a time duration.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    startTimer(eTimeLeftInMillis);
                 }
             }
         });
 
-        eButtonSet.setOnClickListener(new View.OnClickListener() {
+
+        eButtonTimeSet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String input = eEditTextInput.getText().toString();
+
+                String input = eEditTimeInput.getText().toString();
+
                 if(input.length() == 0) {
                     Toast.makeText(Exercises.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 long millisinput = Long.parseLong(input)*60000;
+
                 if(millisinput == 0)    {
                     Toast.makeText(Exercises.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
+                eTimeSet = true;
                 setTime(millisinput);
-                eEditTextInput.setText("");
+                eEditTimeInput.setText("");
             }
         });
+
 
         eButtonReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 resetTimer();
             }
         });
 
-       eRestSet.setOnClickListener(new View.OnClickListener() {
+
+       eButtonRestSet.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view) {
+               String input = eEditRestInput.getText().toString();
+               if(input.length() == 0) {
+                   Toast.makeText(Exercises.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                   return;
+               }
+
+               long millisinput = Long.parseLong(input)*60000;
+               if(millisinput == 0)    {
+                   Toast.makeText(Exercises.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                   return;
+               }
+
+               eRestTimeInMillis = millisinput;
+               closeKeyboard();
 
            }
        });
@@ -181,16 +219,21 @@ public class Exercises extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
+    /**
+     * Takes a time input from the user and sets it as the countdowntime.
+     * @param milliseconds
+     */
     private void setTime(long milliseconds)  {
-        eStatrTimeInMillis = milliseconds;
+        eStartTimeInMillis = milliseconds;
         resetTimer();
         closeKeyboard();
     }
 
-    private void startTimer()   {
+    private void startTimer(long time)   {
+
         eEndTime = System.currentTimeMillis() + eTimeLeftInMillis;
 
-        eCountDownTimer = new CountDownTimer(eTimeLeftInMillis,1000) {
+        eCountDownTimer = new CountDownTimer(time,1000) {
             @Override
             public void onTick(long millisLeftUntilFinished) {
                 eTimeLeftInMillis = millisLeftUntilFinished;
@@ -201,7 +244,7 @@ public class Exercises extends AppCompatActivity {
             public void onFinish() {
                 setCounter--;
                 if(setCounter > 0) {
-                    //rest();
+                    rest();
                 }
 
                 eTimerRunning = false;
@@ -221,44 +264,56 @@ public class Exercises extends AppCompatActivity {
     }
 
     private void resetTimer() {
-        eTimeLeftInMillis = eStatrTimeInMillis;
+        eTimeLeftInMillis = eStartTimeInMillis;
         updateCountDownText();
         updateInterface();
     }
 
     private void updateCountDownText() {
-        int hours = (int) (eTimeLeftInMillis / 1000) / 36000;
-        int minutes = (int) ((eTimeLeftInMillis/1000)/ 3600) /60;
-        int seconds = (int) (eTimeLeftInMillis/1000)%60;
+        long seconds = (eTimeLeftInMillis / 1000) % 60;
+        long minutes = (eTimeLeftInMillis / (1000 * 60)) % 60;
+        long hours = (eTimeLeftInMillis / (1000 * 60 * 60)) % 24;
 
-        String timeLeftFormatted = String.format(Locale.getDefault(),"%d:%02d:%02d",hours, minutes, seconds);
+        String timeLeftFormatted = String.format(Locale.getDefault(),"%02d:%02d:%02d",hours, minutes, seconds);
 
         eTextViewCountDown.setText(timeLeftFormatted);
     }
 
     private void updateInterface() {
         if (eTimerRunning) {
-            eEditTextInput.setVisibility(View.INVISIBLE);
-            eButtonSet.setVisibility(View.INVISIBLE);
+            eEditTimeInput.setVisibility(View.INVISIBLE);
+            eButtonTimeSet.setVisibility(View.INVISIBLE);
+
             eButtonReset.setVisibility(View.INVISIBLE);
             eButtonStartPause.setText("Pause");
         } else {
             eButtonStartPause.setText("Start");
-            eEditTextInput.setVisibility(View.VISIBLE);
-            eButtonSet.setVisibility(View.VISIBLE);
+
+            eEditTimeInput.setVisibility(View.VISIBLE);
+            eButtonTimeSet.setVisibility(View.VISIBLE);
+
             if (eTimeLeftInMillis < 1000) {
                 eButtonStartPause.setVisibility(View.INVISIBLE);
             } else {
                 eButtonStartPause.setVisibility(View.VISIBLE);
             }
 
-            if (eTimeLeftInMillis < eStatrTimeInMillis) {
+            if (eTimeLeftInMillis < eStartTimeInMillis) {
                 eButtonReset.setVisibility(View.VISIBLE);
             } else {
                 eButtonReset.setVisibility(View.INVISIBLE);
             }
         }
     }
+
+    //-------------------------------------- SETS ----------------------------------------------------
+    private void rest() {
+        startTimer(eRestTimeInMillis);
+    }
+
+
+
+    //---------------------------------------OTHER----------------------------------------------------
 
     private void closeKeyboard() {
         View view = this.getCurrentFocus();
