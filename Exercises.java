@@ -17,8 +17,6 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
-
 public class Exercises extends AppCompatActivity {
 
     private static final String TAG = "Exercises";
@@ -143,7 +141,13 @@ public class Exercises extends AppCompatActivity {
 
         eButtonStartPause = findViewById(R.id.bt_start_pause);
         eButtonReset = findViewById(R.id.bt_reset);
-        eButtonTimeSet = findViewById(R.id.bt_set);
+
+        eButtonTimeSet = findViewById(R.id.bt_ADD);
+
+        eHoursInput = findViewById(R.id.et_set_time_hours);
+        eMinutesInput = findViewById(R.id.et_set_time_minutes);
+        eSecondsInput = findViewById(R.id.et_set_time_seconds);
+
 
         //read buttons-------------------
 
