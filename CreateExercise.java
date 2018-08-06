@@ -1,5 +1,6 @@
 package tobemo.yourworkout;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+
 
 public class CreateExercise extends AppCompatActivity {
 
@@ -26,7 +29,7 @@ public class CreateExercise extends AppCompatActivity {
     private EditText eMinutesInput;
     private EditText eSecondsInput;
     private EditText eBreakMinutesInput;
-    private EditText eBrealSecondsInput;
+    private EditText eBreakSecondsInput;
 
     private Button eButtonTimeSet;
 
@@ -44,17 +47,26 @@ public class CreateExercise extends AppCompatActivity {
         eMinutesInput = findViewById(R.id.et_set_time_minutes);
         eSecondsInput = findViewById(R.id.et_set_time_seconds);
         eBreakMinutesInput = findViewById(R.id.et_set_rest_time_minutes);
-        eBrealSecondsInput = findViewById(R.id.et_set_rest_time_seconds);
+        eBreakSecondsInput = findViewById(R.id.et_set_rest_time_seconds);
 
 
+        //remembering things
         eButtonTimeSet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 //save name
                 name = eNameInput.getText().toString();
+                if(name.length() == 0)  {
+                    Toast.makeText(CreateExercise.this, "Add exercise name.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 //save sets
+                if(sets != 0)  {
+                    Toast.makeText(CreateExercise.this, "Choose the amount of sets.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 //save duration
                 long hours = 0;
@@ -95,20 +107,40 @@ public class CreateExercise extends AppCompatActivity {
                     minutesBreak = Long.parseLong(eBreakMinutesInput.getText().toString())
                             * 60 * 1000;
                 }
-                if (eBrealSecondsInput.getText().toString().length() != 0) {
-                    secondsBreak = Long.parseLong(eBrealSecondsInput.getText().toString())
+                if (eBreakSecondsInput.getText().toString().length() != 0) {
+                    secondsBreak = Long.parseLong(eBreakSecondsInput.getText().toString())
                             * 1000;
                 }
 
-                long millisinputBreak =  minutesBreak + secondsBreak;
+                long millisInputBreak =  minutesBreak + secondsBreak;
 
-                if (millisinputBreak == 0) {
+                if (millisInputBreak == 0) {
                     Toast.makeText(CreateExercise.this, "No time input", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                breakDurationInMillis = millisinputBreak;
+                breakDurationInMillis = millisInputBreak;
+
+                if(breakDurationInMillis == 0)  {
+                    Toast.makeText(CreateExercise.this, "No duration set.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                eHoursInput.setText("");
+                eMinutesInput.setText("");
+                eSecondsInput.setText("");
+                eBreakMinutesInput.setText("");
+                eBreakSecondsInput.setText("");
+
+                Toast.makeText(CreateExercise.this, "Exercise Added", Toast.LENGTH_SHORT).show();
+
+                //TODO: save localy
+
+
+                Intent Exercises = new Intent(CreateExercise.this,Exercises.class);
+                startActivity(Exercises);
             }
         });
     }
+
 }
