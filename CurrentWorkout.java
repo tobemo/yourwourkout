@@ -181,4 +181,4 @@ public class CurrentWorkout extends AppCompatActivity {
 
 }
 
-//TODO switch fix formatting; choose type of workout; button to say reps done; if reps done/timer out -> start break, set--; if set done next exercise
+//TODO save locally, button to say reps done; if reps done/timer out -> start break, set--; if set done next exercise

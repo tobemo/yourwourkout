@@ -7,8 +7,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-
+import android.widget.ViewFlipper;
 
 
 public class CreateExercise extends AppCompatActivity {
@@ -17,21 +18,28 @@ public class CreateExercise extends AppCompatActivity {
 
     protected String name;
 
-    protected int sets;
+    protected int intSets;
+    protected int intReps;
 
-    protected long durationInMillis;    //TODO: implement reps
+    protected long longDurationInMillis;    //TODO: implement reps
+    protected long longBreakDurationInMillis;
 
-    protected long breakDurationInMillis;
+    private ViewFlipper viewFlipperRepsOrSecs;
 
-    private EditText eNameInput;
+    private EditText editTextNameInput;
+    private EditText editTextHoursInput;
+    private EditText editTextMinutesInput;
+    private EditText editTextSecondsInput;
+    private EditText editTextBreakMinutesInput;
+    private EditText editTextBreakSecondsInput;
+    private EditText editTextReps;
+    private EditText editTextSets;
 
-    private EditText eHoursInput;
-    private EditText eMinutesInput;
-    private EditText eSecondsInput;
-    private EditText eBreakMinutesInput;
-    private EditText eBreakSecondsInput;
+    private Button buttonAdd;
+    private Button buttonRepsSecs;
 
-    private Button eButtonTimeSet;
+    private boolean booleanTypeOfExerciseIsReps;
+
 
 
     @Override
@@ -39,76 +47,128 @@ public class CreateExercise extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_exercise);
 
-        eButtonTimeSet = findViewById(R.id.bt_ADD);
+        viewFlipperRepsOrSecs = findViewById(R.id.vf_reps_or_secs);
 
-        eNameInput = findViewById(R.id.et_exercise_name_input);
+        buttonAdd = findViewById(R.id.bt_ADD);
 
-        eHoursInput = findViewById(R.id.et_set_time_hours);
-        eMinutesInput = findViewById(R.id.et_set_time_minutes);
-        eSecondsInput = findViewById(R.id.et_set_time_seconds);
-        eBreakMinutesInput = findViewById(R.id.et_set_rest_time_minutes);
-        eBreakSecondsInput = findViewById(R.id.et_set_rest_time_seconds);
+        buttonRepsSecs = findViewById(R.id.bt_reps_or_duration);
+
+        editTextNameInput = findViewById(R.id.et_exercise_name_input);
+
+        editTextHoursInput = findViewById(R.id.et_set_time_hours);
+        editTextMinutesInput = findViewById(R.id.et_set_time_minutes);
+        editTextSecondsInput = findViewById(R.id.et_set_time_seconds);
+        editTextBreakMinutesInput = findViewById(R.id.et_set_rest_time_minutes);
+        editTextBreakSecondsInput = findViewById(R.id.et_set_rest_time_seconds);
+        editTextReps = findViewById(R.id.et_set_exercise_reps);
+        editTextSets = findViewById(R.id.et_set_exercise_sets);
+
+
+
+        //switch between sec or reps type of exercise
+        buttonRepsSecs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(booleanTypeOfExerciseIsReps) {
+
+                    viewFlipperRepsOrSecs.setDisplayedChild(0);
+
+                    buttonRepsSecs.setText("Secs");
+                    booleanTypeOfExerciseIsReps = false;
+                }   else    {
+
+                    viewFlipperRepsOrSecs.setDisplayedChild(1);
+
+                    buttonRepsSecs.setText("Reps");
+                    booleanTypeOfExerciseIsReps = true;
+                }
+
+
+            }
+        });
 
 
         //remembering things
-        eButtonTimeSet.setOnClickListener(new View.OnClickListener() {
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 //save name
-                name = eNameInput.getText().toString();
+                name = editTextNameInput.getText().toString();
+
                 if(name.length() == 0)  {
                     Toast.makeText(CreateExercise.this, "Add exercise name.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                //save sets
-                if(sets != 0)  {
-                    Toast.makeText(CreateExercise.this, "Choose the amount of sets.", Toast.LENGTH_SHORT).show();
+
+                //save intSets
+                if(editTextSets.getText().toString().length() != 0)  {
+
+                    intSets = Integer.parseInt(editTextSets.getText().toString());
+
+                }   else    {
+                    Toast.makeText(CreateExercise.this, "Choose the amount of intSets.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                //save duration
-                long hours = 0;
-                long minutes = 0;
-                long seconds = 0;
 
-                Log.d(TAG, "hours in chars= " + eHoursInput.getText().toString());
 
-                if (eHoursInput.getText().toString().length() != 0) {
-                    hours = Long.parseLong(eHoursInput.getText().toString())
-                            * 60 * 60 * 1000;
+                //save reps or duration
+                if(booleanTypeOfExerciseIsReps) {
+                    if(editTextReps.getText().toString().length() != 0)  {
+                        intReps = Integer.parseInt(editTextReps.getText().toString());
+                    }   else    {
+                        Toast.makeText(CreateExercise.this, "No amount of repetitions set.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                }   else {
+                    long hours = 0;
+                    long minutes = 0;
+                    long seconds = 0;
+
+                    Log.d(TAG, "hours in chars= " + editTextHoursInput.getText().toString());
+
+                    if (editTextHoursInput.getText().toString().length() != 0) {
+                        hours = Long.parseLong(editTextHoursInput.getText().toString())
+                                * 60 * 60 * 1000;
+                    }
+                    if (editTextMinutesInput.getText().toString().length() != 0) {
+                        minutes = Long.parseLong(editTextMinutesInput.getText().toString())
+                                * 60 * 1000;
+                    }
+                    if (editTextSecondsInput.getText().toString().length() != 0) {
+                        seconds = Long.parseLong(editTextSecondsInput.getText().toString())
+                                * 1000;
+                    }
+
+
+                    long millisinput = hours + minutes + seconds;
+
+                    Log.d(TAG, "millis = " + millisinput);
+
+                    if (millisinput == 0) {
+                        Toast.makeText(CreateExercise.this, "No time input.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    longDurationInMillis = millisinput;
+
+
                 }
-                if (eMinutesInput.getText().toString().length() != 0) {
-                    minutes = Long.parseLong(eMinutesInput.getText().toString())
-                            * 60 * 1000;
-                }
-                if (eSecondsInput.getText().toString().length() != 0) {
-                    seconds = Long.parseLong(eSecondsInput.getText().toString())
-                            * 1000;
-                }
-
-                long millisinput = hours + minutes + seconds;
-                Log.d(TAG, "millis = " + millisinput);
-
-                if (millisinput == 0) {
-                    Toast.makeText(CreateExercise.this, "No time input", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                durationInMillis = millisinput;
 
                 //save break
                 long minutesBreak = 0;
                 long secondsBreak = 0;
 
 
-                if (eBreakMinutesInput.getText().toString().length() != 0) {
-                    minutesBreak = Long.parseLong(eBreakMinutesInput.getText().toString())
+                if (editTextBreakMinutesInput.getText().toString().length() != 0) {
+                    minutesBreak = Long.parseLong(editTextBreakMinutesInput.getText().toString())
                             * 60 * 1000;
                 }
-                if (eBreakSecondsInput.getText().toString().length() != 0) {
-                    secondsBreak = Long.parseLong(eBreakSecondsInput.getText().toString())
+                if (editTextBreakSecondsInput.getText().toString().length() != 0) {
+                    secondsBreak = Long.parseLong(editTextBreakSecondsInput.getText().toString())
                             * 1000;
                 }
 
@@ -119,18 +179,21 @@ public class CreateExercise extends AppCompatActivity {
                     return;
                 }
 
-                breakDurationInMillis = millisInputBreak;
+                longBreakDurationInMillis = millisInputBreak;
 
-                if(breakDurationInMillis == 0)  {
+
+                if(longBreakDurationInMillis == 0)  {
                     Toast.makeText(CreateExercise.this, "No duration set.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                eHoursInput.setText("");
-                eMinutesInput.setText("");
-                eSecondsInput.setText("");
-                eBreakMinutesInput.setText("");
-                eBreakSecondsInput.setText("");
+                editTextHoursInput.setText("");
+                editTextMinutesInput.setText("");
+                editTextSecondsInput.setText("");
+                editTextBreakMinutesInput.setText("");
+                editTextBreakSecondsInput.setText("");
+                editTextReps.setText("");
+                editTextSets.setText("");
 
                 Toast.makeText(CreateExercise.this, "Exercise Added", Toast.LENGTH_SHORT).show();
 
@@ -142,5 +205,7 @@ public class CreateExercise extends AppCompatActivity {
             }
         });
     }
+
+
 
 }

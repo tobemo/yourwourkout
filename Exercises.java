@@ -244,7 +244,7 @@ public class Exercises extends AppCompatActivity {
     }
 
     /**
-     * Takes a time input from the user and sets it as the countdowntime.
+     * Takes a time input from the user and intSets it as the countdowntime.
      * @param milliseconds
      */
     private void setTime(long milliseconds)  {
