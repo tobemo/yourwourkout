@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,13 +17,13 @@ public class CreateExercise extends AppCompatActivity {
 
     private static final String TAG = "CreateExercise";
 
-    protected String name;
+    private String name;
 
-    protected int intSets;
-    protected int intReps;
+    private int intSets;
+    private int intReps;
 
-    protected long longDurationInMillis;    //TODO: implement reps
-    protected long longBreakDurationInMillis;
+    private long longDurationInMillis;
+    private long longBreakDurationInMillis;
 
     private ViewFlipper viewFlipperRepsOrSecs;
 
@@ -93,6 +94,8 @@ public class CreateExercise extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                Exercise exercise = new Exercise();
+
                 //save name
                 name = editTextNameInput.getText().toString();
 
@@ -101,6 +104,7 @@ public class CreateExercise extends AppCompatActivity {
                     return;
                 }
 
+                exercise.setName(name);
 
                 //save intSets
                 if(editTextSets.getText().toString().length() != 0)  {
@@ -112,23 +116,33 @@ public class CreateExercise extends AppCompatActivity {
                     return;
                 }
 
-
+                exercise.setIntSets(intSets);
 
                 //save reps or duration
                 if(booleanTypeOfExerciseIsReps) {
+
+                    final int intExerciseIsReps = 1;
+                    exercise.setIntTypeOfExerciseIsReps(intExerciseIsReps);
+
                     if(editTextReps.getText().toString().length() != 0)  {
+
                         intReps = Integer.parseInt(editTextReps.getText().toString());
+                        exercise.setIntReps(intReps);
+                        exercise.setLongDurationInMillis(0);
+
                     }   else    {
                         Toast.makeText(CreateExercise.this, "No amount of repetitions set.", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                 }   else {
+
+                    final int intExerciseIsNotReps = 0;
+                    exercise.setIntTypeOfExerciseIsReps(intExerciseIsNotReps);
+
                     long hours = 0;
                     long minutes = 0;
                     long seconds = 0;
-
-                    Log.d(TAG, "hours in chars= " + editTextHoursInput.getText().toString());
 
                     if (editTextHoursInput.getText().toString().length() != 0) {
                         hours = Long.parseLong(editTextHoursInput.getText().toString())
@@ -143,18 +157,15 @@ public class CreateExercise extends AppCompatActivity {
                                 * 1000;
                     }
 
-
                     long millisinput = hours + minutes + seconds;
-
-                    Log.d(TAG, "millis = " + millisinput);
 
                     if (millisinput == 0) {
                         Toast.makeText(CreateExercise.this, "No time input.", Toast.LENGTH_SHORT).show();
                         return;
                     }
-
                     longDurationInMillis = millisinput;
 
+                    exercise.setLongDurationInMillis(longDurationInMillis);
 
                 }
 
@@ -181,12 +192,10 @@ public class CreateExercise extends AppCompatActivity {
 
                 longBreakDurationInMillis = millisInputBreak;
 
+                exercise.setLongBreakDurationInMillis(longBreakDurationInMillis);
 
-                if(longBreakDurationInMillis == 0)  {
-                    Toast.makeText(CreateExercise.this, "No duration set.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
 
+                //clear fields
                 editTextHoursInput.setText("");
                 editTextMinutesInput.setText("");
                 editTextSecondsInput.setText("");
@@ -195,16 +204,28 @@ public class CreateExercise extends AppCompatActivity {
                 editTextReps.setText("");
                 editTextSets.setText("");
 
-                Toast.makeText(CreateExercise.this, "Exercise Added", Toast.LENGTH_SHORT).show();
 
                 //TODO: save localy
+                DatabaseHelper databaseHelper = new DatabaseHelper(CreateExercise.this);
+                databaseHelper.insertExercise(exercise);
+                Toast.makeText(CreateExercise.this, "Exercise Added", Toast.LENGTH_SHORT).show();
 
-
-                Intent Exercises = new Intent(CreateExercise.this,Exercises.class);
-                startActivity(Exercises);
+                Intent exercises = new Intent(CreateExercise.this,Exercises.class);
+                startActivity(exercises);
             }
         });
     }
+
+
+    //TODO: implelemt
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
 
 
 

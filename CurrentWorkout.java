@@ -1,5 +1,6 @@
 package tobemo.yourworkout;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -39,9 +40,12 @@ public class CurrentWorkout extends AppCompatActivity {
 
     private TextView textViewCountDown;
     private TextView textViewCurrentSet;
-
-
     private TextView mTextMessage;
+
+    private String millisLeft = "millisLeft";
+    private String timerRunning = "timerRunning";
+    private String endTime = "endTime";
+    private String startTimeInMillis = "startTimeInMillis";
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -49,19 +53,65 @@ public class CurrentWorkout extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
+                case R.id.navigation_current_workout:
                     mTextMessage.setText(R.string.title_home);
                     return true;
-                case R.id.navigation_dashboard:
+                case R.id.navigation_workouts:
                     mTextMessage.setText(R.string.title_dashboard);
                     return true;
-                case R.id.navigation_notifications:
+                case R.id.navigation_exercises:
                     mTextMessage.setText(R.string.title_notifications);
                     return true;
             }
             return false;
         }
     };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+
+        longExerciseTimeInMillis = prefs.getLong(startTimeInMillis,666);
+        longTimeLeftInMillis = prefs.getLong(millisLeft, longExerciseTimeInMillis);
+        booleanTimerRunning = prefs.getBoolean(timerRunning,false);
+
+        updateTimerText();
+        updateInterface();
+
+        if(booleanTimerRunning)   {
+            longEndTime = prefs.getLong(endTime,0);
+            longTimeLeftInMillis = longEndTime - System.currentTimeMillis();
+
+            if(longTimeLeftInMillis < 0)   {
+                longTimeLeftInMillis = 0;
+                booleanTimerRunning = false;
+                updateTimerText();
+                updateInterface();
+            }   else    {
+                startTimer(longTimeLeftInMillis);
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putLong(startTimeInMillis, longExerciseTimeInMillis);
+        editor.putLong(millisLeft, longTimeLeftInMillis);
+        editor.putBoolean(timerRunning, booleanTimerRunning);
+        editor.putLong(endTime, longEndTime);
+
+        editor.apply();
+
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
