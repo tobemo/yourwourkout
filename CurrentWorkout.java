@@ -1,5 +1,6 @@
 package tobemo.yourworkout;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -141,6 +142,29 @@ public class CurrentWorkout extends AppCompatActivity {
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+
+                    case R.id.navigation_current_workout:
+                        Intent currentWorkout = new Intent(CurrentWorkout.this, CurrentWorkout.class);
+                        startActivity(currentWorkout);
+                        break;
+
+                    case R.id.navigation_workouts:
+                        //TODO: create intent once activity exists
+                        break;
+
+                    case R.id.navigation_exercises:
+                        Intent exercises = new Intent(CurrentWorkout.this,Exercises.class);
+                        startActivity(exercises);
+                        break;
+                }
+                return false;
+            }
+        });
     }
 
 
@@ -231,4 +255,4 @@ public class CurrentWorkout extends AppCompatActivity {
 
 }
 
-//TODO save locally, button to say reps done; if reps done/timer out -> start break, set--; if set done next exercise
+//TODO fill exercises button to say reps done; if reps done/timer out -> start break, set--; if set done next exercise; save workouts; chance bottom nav icons

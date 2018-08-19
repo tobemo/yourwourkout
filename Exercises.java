@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,6 +19,7 @@ public class Exercises extends AppCompatActivity {
 
     private static final String TAG = "Exercises";
 
+    private FloatingActionButton buttonCreateExercise;
 
 
     private EditText editRestInput;
@@ -82,6 +85,10 @@ public class Exercises extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercises);
 
+        buttonCreateExercise = findViewById(R.id.bt_create_exercise);
+        buttonCreateExercise.setImageResource(R.drawable.ic_add_white_24dp);
+
+
         exercises = findViewById(R.id.tv_exercises);
 
         mTextMessage = (TextView) findViewById(R.id.message);
@@ -94,6 +101,15 @@ public class Exercises extends AppCompatActivity {
         for(int i = 0; i < exerciseList.size(); i++)    {
             exercises.append("\n" + exerciseList.get(i).getName());
         }
+
+        buttonCreateExercise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent createExercise = new Intent(Exercises.this, CreateExercise.class);
+                startActivity(createExercise);
+
+            }
+        });
 
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
