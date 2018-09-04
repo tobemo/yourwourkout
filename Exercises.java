@@ -7,6 +7,9 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -54,6 +57,8 @@ public class Exercises extends AppCompatActivity {
     private TextView mTextMessage;
     private TextView exercises;
 
+    private List<Exercise> listExercises;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -78,28 +83,24 @@ public class Exercises extends AppCompatActivity {
 
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercises);
 
+        Log.d(TAG,"onCreate");
+
         buttonCreateExercise = findViewById(R.id.bt_create_exercise);
         buttonCreateExercise.setImageResource(R.drawable.ic_add_white_24dp);
-
-
-        exercises = findViewById(R.id.tv_exercises);
 
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        DatabaseHelper databaseHelper = new DatabaseHelper(Exercises.this);
-        List<Exercise> exerciseList = databaseHelper.getAllData();
+        listExercises = getExercises();
 
-        for(int i = 0; i < exerciseList.size(); i++)    {
-            exercises.append("\n" + exerciseList.get(i).getName());
+        if(!listExercises.isEmpty())    {
+            initRecyclerView();
         }
 
         buttonCreateExercise.setOnClickListener(new View.OnClickListener() {
@@ -136,6 +137,17 @@ public class Exercises extends AppCompatActivity {
 
     }
 
+    private List<Exercise> getExercises() {
+        Log.d(TAG,"getExercises");
+        DatabaseHelper databaseHelper = new DatabaseHelper(Exercises.this);
+        return databaseHelper.getAllExercises();
+    }
 
+    private void initRecyclerView(){
+        RecyclerView recyclerView = findViewById(R.id.rv_exercises);
+        ExerciseAdapter adapter = new ExerciseAdapter(this, listExercises );
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
 
 }

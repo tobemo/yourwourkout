@@ -1,8 +1,17 @@
 package tobemo.yourworkout;
 
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 
+public class Exercise extends AppCompatActivity {
 
-public class Exercise {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.exercise_card);
+    }
+
+    protected int ID;
 
     protected String name;
 
@@ -32,6 +41,10 @@ public class Exercise {
 
     public Exercise(){}
 
+    public final void setID(int ID)   {
+        this.ID = ID;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -54,6 +67,14 @@ public class Exercise {
 
     public void setIntTypeOfExerciseIsReps(int intTypeOfExerciseIsReps) {
         this.intTypeOfExerciseIsReps = intTypeOfExerciseIsReps;
+    }
+
+    public void setBooleanTypeOfExerciseIsReps(boolean booleanTypeOfExerciseIsReps) {
+        this.booleanTypeOfExerciseIsReps = booleanTypeOfExerciseIsReps;
+    }
+
+    public int getID()  {
+        return ID;
     }
 
     public String getName() {
@@ -83,4 +104,5 @@ public class Exercise {
     public int getIntTypeOfExerciseIsReps() {
         return intTypeOfExerciseIsReps;
     }
+
 }

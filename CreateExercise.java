@@ -97,102 +97,18 @@ public class CreateExercise extends AppCompatActivity {
                 Exercise exercise = new Exercise();
 
                 //save name
-                name = editTextNameInput.getText().toString();
-
-                if(name.length() == 0)  {
-                    Toast.makeText(CreateExercise.this, "Add exercise name.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                exercise.setName(name);
+                setName(exercise);
 
                 //save intSets
-                if(editTextSets.getText().toString().length() != 0)  {
+                setSets(exercise);
 
-                    intSets = Integer.parseInt(editTextSets.getText().toString());
-
-                }   else    {
-                    Toast.makeText(CreateExercise.this, "Choose the amount of intSets.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                exercise.setIntSets(intSets);
 
                 //save reps or duration
-                if(booleanTypeOfExerciseIsReps) {
+                setRepsOrSecs(exercise);
 
-                    final int intExerciseIsReps = 1;
-                    exercise.setIntTypeOfExerciseIsReps(intExerciseIsReps);
-
-                    if(editTextReps.getText().toString().length() != 0)  {
-
-                        intReps = Integer.parseInt(editTextReps.getText().toString());
-                        exercise.setIntReps(intReps);
-                        exercise.setLongDurationInMillis(0);
-
-                    }   else    {
-                        Toast.makeText(CreateExercise.this, "No amount of repetitions set.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                }   else {
-
-                    final int intExerciseIsNotReps = 0;
-                    exercise.setIntTypeOfExerciseIsReps(intExerciseIsNotReps);
-
-                    long hours = 0;
-                    long minutes = 0;
-                    long seconds = 0;
-
-                    if (editTextHoursInput.getText().toString().length() != 0) {
-                        hours = Long.parseLong(editTextHoursInput.getText().toString())
-                                * 60 * 60 * 1000;
-                    }
-                    if (editTextMinutesInput.getText().toString().length() != 0) {
-                        minutes = Long.parseLong(editTextMinutesInput.getText().toString())
-                                * 60 * 1000;
-                    }
-                    if (editTextSecondsInput.getText().toString().length() != 0) {
-                        seconds = Long.parseLong(editTextSecondsInput.getText().toString())
-                                * 1000;
-                    }
-
-                    long millisinput = hours + minutes + seconds;
-
-                    if (millisinput == 0) {
-                        Toast.makeText(CreateExercise.this, "No time input.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    longDurationInMillis = millisinput;
-
-                    exercise.setLongDurationInMillis(longDurationInMillis);
-
-                }
 
                 //save break
-                long minutesBreak = 0;
-                long secondsBreak = 0;
-
-
-                if (editTextBreakMinutesInput.getText().toString().length() != 0) {
-                    minutesBreak = Long.parseLong(editTextBreakMinutesInput.getText().toString())
-                            * 60 * 1000;
-                }
-                if (editTextBreakSecondsInput.getText().toString().length() != 0) {
-                    secondsBreak = Long.parseLong(editTextBreakSecondsInput.getText().toString())
-                            * 1000;
-                }
-
-                long millisInputBreak =  minutesBreak + secondsBreak;
-
-                if (millisInputBreak == 0) {
-                    Toast.makeText(CreateExercise.this, "No time input", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                longBreakDurationInMillis = millisInputBreak;
-
-                exercise.setLongBreakDurationInMillis(longBreakDurationInMillis);
+                setBreak(exercise);
 
 
                 //clear fields
@@ -205,7 +121,6 @@ public class CreateExercise extends AppCompatActivity {
                 editTextSets.setText("");
 
 
-                //TODO: save localy
                 DatabaseHelper databaseHelper = new DatabaseHelper(CreateExercise.this);
                 databaseHelper.insertExercise(exercise);
                 Toast.makeText(CreateExercise.this, "Exercise Added", Toast.LENGTH_SHORT).show();
@@ -214,6 +129,103 @@ public class CreateExercise extends AppCompatActivity {
                 startActivity(exercises);
             }
         });
+    }
+
+    private void setBreak(Exercise exercise) {
+        long minutesBreak = 0;
+        long secondsBreak = 0;
+
+
+        if (editTextBreakMinutesInput.getText().toString().length() != 0) {
+            minutesBreak = Long.parseLong(editTextBreakMinutesInput.getText().toString())
+                    * 60 * 1000;
+        }
+        if (editTextBreakSecondsInput.getText().toString().length() != 0) {
+            secondsBreak = Long.parseLong(editTextBreakSecondsInput.getText().toString())
+                    * 1000;
+        }
+
+        longBreakDurationInMillis = minutesBreak + secondsBreak;
+
+        exercise.setLongBreakDurationInMillis(longBreakDurationInMillis);
+    }
+
+    private void setRepsOrSecs(Exercise exercise) {
+        int intExerciseIsReps = 1;
+        if(booleanTypeOfExerciseIsReps) {
+
+            exercise.setIntTypeOfExerciseIsReps(intExerciseIsReps);
+
+            if(editTextReps.getText().toString().length() != 0)  {
+
+                intReps = Integer.parseInt(editTextReps.getText().toString());
+                exercise.setIntReps(intReps);
+                exercise.setLongDurationInMillis(0);
+
+            }   else    {
+                Toast.makeText(CreateExercise.this, "No amount of repetitions set.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+        }   else {
+
+            intExerciseIsReps = 0;
+            exercise.setIntTypeOfExerciseIsReps(intExerciseIsReps);
+
+            exercise.setIntReps(0);
+
+            long hours = 0;
+            long minutes = 0;
+            long seconds = 0;
+
+            if (editTextHoursInput.getText().toString().length() != 0) {
+                hours = Long.parseLong(editTextHoursInput.getText().toString())
+                        * 60 * 60 * 1000;
+            }
+            if (editTextMinutesInput.getText().toString().length() != 0) {
+                minutes = Long.parseLong(editTextMinutesInput.getText().toString())
+                        * 60 * 1000;
+            }
+            if (editTextSecondsInput.getText().toString().length() != 0) {
+                seconds = Long.parseLong(editTextSecondsInput.getText().toString())
+                        * 1000;
+            }
+
+            long millisinput = hours + minutes + seconds;
+
+            if (millisinput == 0) {
+                Toast.makeText(CreateExercise.this, "No time input.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            longDurationInMillis = millisinput;
+
+            exercise.setLongDurationInMillis(longDurationInMillis);
+
+        }
+    }
+
+    private void setSets(Exercise exercise) {
+        if(editTextSets.getText().toString().length() != 0)  {
+
+            intSets = Integer.parseInt(editTextSets.getText().toString());
+
+        }   else    {
+            Toast.makeText(CreateExercise.this, "Choose the amount of intSets.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        exercise.setIntSets(intSets);
+    }
+
+    private void setName(Exercise exercise) {
+        name = editTextNameInput.getText().toString();
+
+        if(name.length() == 0)  {
+            Toast.makeText(CreateExercise.this, "Add exercise name.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        exercise.setName(name);
     }
 
 

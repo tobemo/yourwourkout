@@ -1,5 +1,6 @@
 package tobemo.yourworkout;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,11 +9,15 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class CurrentWorkout extends AppCompatActivity {
@@ -47,6 +52,8 @@ public class CurrentWorkout extends AppCompatActivity {
     private String timerRunning = "timerRunning";
     private String endTime = "endTime";
     private String startTimeInMillis = "startTimeInMillis";
+
+    private List<Exercise> listExercises = new ArrayList<>();
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -124,6 +131,12 @@ public class CurrentWorkout extends AppCompatActivity {
 
         buttonStartPause = findViewById(R.id.startWorkout);
 
+        getAllExercises();
+
+        if(!listExercises.isEmpty())    {
+            initRecyclerView();
+        }
+
         booleanTypeOfExerciseIsReps = true;
 
 
@@ -155,6 +168,8 @@ public class CurrentWorkout extends AppCompatActivity {
 
                     case R.id.navigation_workouts:
                         //TODO: create intent once activity exists
+                        Intent ex = new Intent(CurrentWorkout.this, Exercise.class);
+                        startActivity(ex);
                         break;
 
                     case R.id.navigation_exercises:
@@ -253,6 +268,28 @@ public class CurrentWorkout extends AppCompatActivity {
         }
     }
 
+    /*Gets all the exercises from  the current_workout_table and puts them in a list.
+     *
+     */
+
+    private void getAllExercises() {
+        DatabaseHelper databaseHelper = new DatabaseHelper(CurrentWorkout.this);
+
+        List<Integer> exerciseIDList = databaseHelper.getCurrentWorkout();
+
+        for(Integer integer: exerciseIDList)    {
+            listExercises.add(databaseHelper.getCertainExercise(integer));
+        }
+
+    }
+
+    private void initRecyclerView(){
+        RecyclerView recyclerView = findViewById(R.id.rv_current_workout);
+        ExerciseAdapter adapter = new ExerciseAdapter(this, listExercises );
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
+
 }
 
-//TODO fill exercises button to say reps done; if reps done/timer out -> start break, set--; if set done next exercise; save workouts; chance bottom nav icons
+//TODO fill exercises; delete exercises also in table; currentworkout different recyclerveiw adapter;drag exercises; button to say reps done; if reps done/timer out -> start break, set--; if set done next exercise; save workouts; chance bottom nav icons; dimens en color extracten
