@@ -19,9 +19,9 @@ import java.util.Locale;
 
 public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHolder>{
 
-    private static final String TAG = "Adapter";
+    private static final String TAG = "exerciseAdapter";
 
-    private List<Exercise> listExercises = new ArrayList<>();
+    private List<Exercise> listExercises;
     private Context context;
 
     public ExerciseAdapter(Context context, List<Exercise> listExercises) {
@@ -69,18 +69,16 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHo
             @Override
             public void onClick(View view) {
                 DatabaseHelper databaseHelper = new DatabaseHelper(holder.buttonSelect.getContext());
-                if( databaseHelper.isUniqueInCurrentWorkoutTable(exercise)) {
-                    databaseHelper.addExerciseToCurrentWorkout(exercise);
-                }   else {
-                    Toast.makeText(context, "Exercise already selected.", Toast.LENGTH_SHORT).show();
-                }
+                databaseHelper.addExerciseToCurrentWorkout(exercise);
+
+                Toast.makeText(context, "Exercise added to Current Workout.", Toast.LENGTH_SHORT).show();
             }
         });
 
         holder.buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseHelper databaseHelper = new DatabaseHelper(holder.buttonSelect.getContext());
+                DatabaseHelper databaseHelper = new DatabaseHelper(holder.buttonDelete.getContext());
                 databaseHelper.deleteExercise(
                         exercise.getID());
 

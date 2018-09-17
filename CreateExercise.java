@@ -74,13 +74,13 @@ public class CreateExercise extends AppCompatActivity {
 
                     viewFlipperRepsOrSecs.setDisplayedChild(0);
 
-                    buttonRepsSecs.setText("Secs");
+                    buttonRepsSecs.setText("Reps");
                     booleanTypeOfExerciseIsReps = false;
                 }   else    {
 
                     viewFlipperRepsOrSecs.setDisplayedChild(1);
 
-                    buttonRepsSecs.setText("Reps");
+                    buttonRepsSecs.setText("Secs");
                     booleanTypeOfExerciseIsReps = true;
                 }
 
@@ -109,17 +109,6 @@ public class CreateExercise extends AppCompatActivity {
 
                 //save break
                 setBreak(exercise);
-
-
-                //clear fields
-                editTextHoursInput.setText("");
-                editTextMinutesInput.setText("");
-                editTextSecondsInput.setText("");
-                editTextBreakMinutesInput.setText("");
-                editTextBreakSecondsInput.setText("");
-                editTextReps.setText("");
-                editTextSets.setText("");
-
 
                 DatabaseHelper databaseHelper = new DatabaseHelper(CreateExercise.this);
                 databaseHelper.insertExercise(exercise);

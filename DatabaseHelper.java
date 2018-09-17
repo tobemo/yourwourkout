@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.nfc.Tag;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +32,13 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String CURRENT_WORKOUT_TABLE = "current_workout_table";
     public static final String EXERCISE_COL = "EXERCISE";
 
+    public static int intLastCurrentWorkoutID;
+
+    private Context context;
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
+        this.context = context;
 
     }
 
@@ -72,6 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         ContentValues contentValues = new ContentValues();
         contentValues.put(EXERCISE_COL, exercise.getID());
         sqLiteDatabase.insert(CURRENT_WORKOUT_TABLE, null, contentValues);
+
     }
 
     public Cursor getData(int id)   {
@@ -172,6 +179,65 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         return exerciseList;
     }
 
+    public List<Exercise> getAllExercisesInCurrentWorkout()    {
+        List<Exercise> exerciseList = new ArrayList<>();
+        sqLiteDatabase = getReadableDatabase();
+        Cursor results = sqLiteDatabase.rawQuery("SELECT * FROM " + CURRENT_WORKOUT_TABLE, null);
+
+
+        if (results.moveToFirst()) {
+            do {
+                int ID = results.getInt(results.getColumnIndex(EXERCISE_COL));
+                Cursor exercises = sqLiteDatabase.rawQuery("SELECT * FROM " + EXERCISES_TABLE + " WHERE " + ID_COL + " ='" + ID + "'", null);
+                if (exercises.moveToFirst()) {
+                    do {
+                        Exercise exercise = new Exercise();
+                        exercise.setID(
+                                exercises.getInt(exercises.getColumnIndex(ID_COL)));
+                        exercise.setName(
+                                exercises.getString(exercises.getColumnIndex(NAME_COL)));
+                        exercise.setIntSets(
+                                exercises.getInt(exercises.getColumnIndex(SETS_COL)));
+                        exercise.setIntTypeOfExerciseIsReps(
+                                exercises.getInt(exercises.getColumnIndex(TYPE_COL)));
+                        exercise.setIntReps(
+                                exercises.getInt(exercises.getColumnIndex(REPS_COL)));
+                        exercise.setLongDurationInMillis(
+                                exercises.getLong(exercises.getColumnIndex(DURATION_COL)));
+                        exercise.setLongBreakDurationInMillis(
+                                exercises.getLong(exercises.getColumnIndex(BREAK_COL)));
+
+                        if (exercise.getIntTypeOfExerciseIsReps() == 1) {
+                            exercise.setBooleanTypeOfExerciseIsReps(true);
+                        }
+
+                        exerciseList.add(exercise);
+
+                    } while (exercises.moveToNext());
+                }
+            } while (results.moveToNext());
+        }
+
+        results.close();
+        return exerciseList;
+    }
+
+    public List<Integer> getIntegers() {
+        List<Integer> currentWorkout = new ArrayList<>();
+        sqLiteDatabase = getReadableDatabase();
+        Cursor results = sqLiteDatabase.rawQuery("SELECT * FROM " + CURRENT_WORKOUT_TABLE, null);
+
+        if (results.moveToFirst()) {
+            do {
+                currentWorkout.add(results.getInt(results.getColumnIndex(ID_COL)));
+            } while (results.moveToNext());
+
+        }
+        return currentWorkout;
+    }
+
+
+
     public boolean isUniqueInCurrentWorkoutTable(Exercise exercise) {
         sqLiteDatabase = getReadableDatabase();
         Cursor result = sqLiteDatabase.rawQuery("SELECT * FROM " + CURRENT_WORKOUT_TABLE + " WHERE " + ID_COL + " = " + exercise.getID(), null);
@@ -187,6 +253,13 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public void deleteExercise(int ID)  {
         sqLiteDatabase = getReadableDatabase();
         String query = "DELETE FROM " + EXERCISES_TABLE + " WHERE " + ID_COL + " = '" + ID + "'";
+        sqLiteDatabase.execSQL(query);
+    }
+
+    public void removeExercise(int ID)  {
+        sqLiteDatabase = getReadableDatabase();
+
+        String query = "DELETE FROM " + CURRENT_WORKOUT_TABLE + " WHERE " + ID_COL + " in (SELECT " + ID_COL + " FROM " + CURRENT_WORKOUT_TABLE + " LIMIT 1 OFFSET " + ID + ")";
         sqLiteDatabase.execSQL(query);
     }
 

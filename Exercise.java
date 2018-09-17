@@ -12,17 +12,20 @@ public class Exercise extends AppCompatActivity {
     }
 
     protected int ID;
+    protected int CurrentWorkoutID;
 
     protected String name;
 
     protected int intSets;
     protected int intReps;
+    protected int intTypeOfExerciseIsReps;
 
+    protected long longBreakAfterExerciseInMillis = 0;
     protected long longDurationInMillis;
     protected long longBreakDurationInMillis;
 
     protected boolean booleanTypeOfExerciseIsReps;
-    protected int intTypeOfExerciseIsReps;
+
     public Exercise(String name, int sets, int type, int reps, long duration, long breakDuration)    {
         this.name = name;
         intSets = sets;
@@ -45,6 +48,10 @@ public class Exercise extends AppCompatActivity {
         this.ID = ID;
     }
 
+    public void setCurrentWorkoutID(int currentWorkoutID) {
+        CurrentWorkoutID = currentWorkoutID;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -65,6 +72,10 @@ public class Exercise extends AppCompatActivity {
         this.longBreakDurationInMillis = longBreakDurationInMillis;
     }
 
+    public void setLongBreakAfterExerciseInMillis(long longBreakAfterExerciseInMillis) {
+        this.longBreakAfterExerciseInMillis = longBreakAfterExerciseInMillis;
+    }
+
     public void setIntTypeOfExerciseIsReps(int intTypeOfExerciseIsReps) {
         this.intTypeOfExerciseIsReps = intTypeOfExerciseIsReps;
     }
@@ -75,6 +86,10 @@ public class Exercise extends AppCompatActivity {
 
     public int getID()  {
         return ID;
+    }
+
+    public int getCurrentWorkoutID() {
+        return CurrentWorkoutID;
     }
 
     public String getName() {
