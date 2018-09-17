@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
@@ -76,6 +75,8 @@ public class CurrentWorkout extends AppCompatActivity {
     private RecyclerView recyclerView;
     private CurrentWorkoutAdapter adapter;
 
+    private ToneGenerator toneGen;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -115,6 +116,9 @@ public class CurrentWorkout extends AppCompatActivity {
         listExercises = getExercises();
 
         booleanWorkoutRunning = false;
+        updateInterface();
+
+        toneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
         if (!listExercises.isEmpty()) {
             initRecyclerView();
@@ -336,9 +340,9 @@ public class CurrentWorkout extends AppCompatActivity {
 //                longTimeLeftInMillis = millisLeftUntilFinished;
 //                Log.d(TAG, "secon left: " + longTimeLeftInMillis/1000 );
 //                setTime();
-//                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+//                ToneGenerator toneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 //                if(longTimeLeftInMillis < 4000) {
-//                    toneGen1.startTone(ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,100);
+//                    toneGen.startTone(ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,100);
 //                }
 //            }
 //
@@ -362,11 +366,10 @@ public class CurrentWorkout extends AppCompatActivity {
             @Override
             public void onTick(long millisLeftUntilFinished) {
                 longTimeLeftInMillis = millisLeftUntilFinished;
-                Log.d(TAG, "secon left: " + longTimeLeftInMillis/1000 );
+                Log.d(TAG, "seconds left: " + longTimeLeftInMillis/1000 );
                 setTime();
-                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
                 if(longTimeLeftInMillis < 4000) {
-                    toneGen1.startTone(ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,100);
+                    toneGen.startTone(ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,100);
                 }
             }
 
@@ -396,9 +399,8 @@ public class CurrentWorkout extends AppCompatActivity {
                 longTimeLeftInMillis = millisLeftUntilFinished;
                 Log.d(TAG, "timeleft" + (longTimeLeftInMillis / 1000) % 60);
                 setTime();
-                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
                 if(longTimeLeftInMillis < 4000) {
-                    toneGen1.startTone(ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,100);
+                    toneGen.startTone(ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,100);
                 }
             }
 
@@ -420,15 +422,14 @@ public class CurrentWorkout extends AppCompatActivity {
         longTimeLeftInMillis = timeInput;
         setSets();
 
-        countDownTimer = new MoreAccurateTimer(timeInput + 1000, 1000) {
+        countDownTimer = new MoreAccurateTimer(timeInput , 1000) {
         @Override                                                                                   // + 1000 is so the first second is also displayed
             public void onTick(long millisLeftUntilFinished) {
                 longTimeLeftInMillis = millisLeftUntilFinished;
                 Log.d(TAG, "timeleft" + (longTimeLeftInMillis / 1000) % 60);
                 setTime();
-                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
                 if(longTimeLeftInMillis < 4000) {
-                    toneGen1.startTone(ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,100);
+                    toneGen.startTone(ToneGenerator.TONE_CDMA_SOFT_ERROR_LITE,100);
                 }
             }
 
